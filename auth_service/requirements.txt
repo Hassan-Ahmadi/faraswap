@@ -1,0 +1,17 @@
+django
+djangorestframework
+djangorestframework-simplejwt
+
+python-decouple==3.8
+
+redis
+django-redis
+
+# Swagger
+drf_yasg==1.21.8
+django-rest-swagger==2.2.0
+
+# MKDocs
+mkdocs
+mkdocs-material
+mkdocs-git-revision-date-localized-plugin

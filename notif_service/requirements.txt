@@ -1,0 +1,12 @@
+django
+djangorestframework
+djangorestframework-simplejwt
+celery
+redis
+django-redis
+
+python-decouple==3.8
+
+# Swagger
+drf_yasg==1.21.8
+django-rest-swagger==2.2.0
