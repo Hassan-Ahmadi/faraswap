@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  auth_service:
+    restart: unless-stopped
+    build:
+      context: ./auth_service
+      dockerfile: ./auth_service/docker/Dockerfile
+    entrypoint: /app/docker/entrypoint.sh
+    volumes:      
+      - static_volume:/app/django_static
+    ports:
+      - "8000:8000"
+    env_file: ./auth_service/.env.sample
+    depends_on:
+      - redis
+      - postgres
+  
+  notif_service:
+    restart: unless-stopped
+    build:
+      context: ./notif_service
+      dockerfile: ./notif_service/docker/backend/Dockerfile
+    entrypoint: /app/docker/backend/entrypoint.sh
+    volumes:      
+      - static_volume:/app/django_static
+    ports:
+      - "8001:8001"
+    env_file: ./notif_service/.env.sample
+    depends_on:
+      - redis
+      - postgres
+  
+  celery_worker:
+    restart: unless-stopped
+    build:
+      context: ./notif_service
+      dockerfile: ./notif_service/docker/celery/Dockerfile
+    entrypoint: /app/docker/celery/entrypoint.sh
+    volumes:
+      - static_volume:/app/django_static
+    env_file: ./notif_service/.env.sample
+    depends_on:
+      - redis
+      - postgres
+  
+  redis:
+    image: redis:6.0.9
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+  
+  postgres:
+    image: postgres:13.1
+    restart: unless-stopped
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+    - POSTGRES_USER=postgres
+    - POSTGRES_PASSWORD=postgres
+    - POSTGRES_DB=auth_service_db
+
+volumes:
+  static_volume: {}
+  postgres_data: {}
+  redis_data: {}

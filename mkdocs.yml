@@ -4,7 +4,7 @@ plugins:
   - search
   - offline
 
-repo_url: https://github.com/Hassan-Ahmadi/faraswap
+repo_url: https://github.com/Hassan-Ahmadi/faraswap.git
 # repo_name: Github
 
 theme:
