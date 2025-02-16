@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.core.cache import cache
 from random import randint
-from notif_service.settings import OTP_TIMEOUT
+from notif_service.settings import OTP_TIMEOUT_SECONDS
 
 from .tasks import send_otp_task
 
@@ -27,6 +27,6 @@ class SendOTPView(APIView):
         otp_key = f"otp:{phone_number}"
 
         send_otp_task.delay(phone_number, otp)
-        cache.set(otp_key, otp, timeout=OTP_TIMEOUT)
+        cache.set(otp_key, otp, timeout=OTP_TIMEOUT_SECONDS)
 
         return Response({"message": "OTP is being sent"}, status=status.HTTP_200_OK)

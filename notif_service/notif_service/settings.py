@@ -23,12 +23,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-59mb9x+#*pqi79spq_jm1$q#j(e*7np(*jknmj^z#fn2@&1z1l'
+SECRET_KEY = config('SECRET_KEY', default='django-insecure-59mb9x+*pqi79spq_jm1$q#j(e*7np(*jknmj^z#fn2@&1z1l')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', cast=bool, default=True)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='*', cast=lambda v: [s.strip() for s in v.split(',')])
 
 
 # Application definition
@@ -44,7 +44,6 @@ INSTALLED_APPS = [
     # third party apps
     "rest_framework",
     "rest_framework_simplejwt",
-    # "django_celery_results",
     'drf_yasg',
     
     # user defined apps
@@ -81,28 +80,24 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'notif_service.wsgi.application'
 
-# REST_FRAMEWORK = {
-#     'DEFAULT_AUTHENTICATION_CLASSES': (
-#         'rest_framework_simplejwt.authentication.JWTAuthentication',
-#     ),
-# }
-
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "notif_service.authentication.JWTAuthentication",  # Custom JWT authentication
     ),
 }
 
+
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
-    "SIGNING_KEY": "9SI7i62M6JZVdvjaJ3EzE3nHFfvsF5h2",  # Ensure this is shared with notif_service
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=config('ACCESS_TOKEN_LIFETIME_MINUTES', default=30, cast=int)),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=config('REFRESH_TOKEN_LIFETIME_DAYS', default=1, cast=int)),
+    "SIGNING_KEY": config("SIGNING_KEY", default="9SI7i62M6JZVdvjaJ3EzE3nHFfvsF5h2"),  # Ensure this is shared with notif_service
 }
 
-CELERY_BROKER_URL = "redis://redis:6379/1"
+CELERY_BROKER_URL = config("CELERY_BROKER_URL", default="redis://redis:6379/1")
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
+
 
 DATABASES = {
     'default': {
@@ -110,6 +105,7 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
 
 
 # Password validation
@@ -149,7 +145,7 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_ROOT = config('STATIC_ROOT', default=os.path.join(BASE_DIR, 'staticfiles'))
 
-MEDIA_URL = '/media/'
+MEDIA_URL = 'media/'
 MEDIA_ROOT = config('MEDIA_ROOT', default=os.path.join(BASE_DIR, 'media'))
 
 # Default primary key field type
@@ -160,8 +156,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': 'redis://127.0.0.1:6379/0',  # Use the appropriate Redis server URL
+        'LOCATION': config("DEFAULT_REDIS_URL", default="redis://localhost:6379/0"),  # Use the appropriate Redis server URL
     }
 }
 
-OTP_TIMEOUT = 300
+OTP_TIMEOUT_SECONDS = config('OTP_TIMEOUT_SECONDS', default=300, cast=int)
